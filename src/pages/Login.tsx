@@ -6,7 +6,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+// Checkbox removed because "Remember me" was removed from the UI
 import { Eye, EyeOff, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,7 +15,6 @@ import { useEffect } from "react";
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  rememberMe: z.boolean().optional(),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -117,27 +116,14 @@ const Login = () => {
               )}
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Checkbox id="rememberMe" {...register("rememberMe")} />
-                <Label htmlFor="rememberMe" className="text-sm font-normal cursor-pointer">
-                  Remember me
-                </Label>
-              </div>
-              <Link
-                to="/forgot-password"
-                className="text-sm text-primary hover:text-primary/80 transition-colors"
-              >
-                Forgot password?
-              </Link>
-            </div>
+            {/* Removed "Remember me" and "Forgot password" per design request */}
 
             <Button
               type="submit"
               disabled={isSubmitting}
               className="w-full bg-gradient-primary hover:opacity-90 text-primary-foreground font-semibold py-6 rounded-lg hover-glow transition-all"
             >
-              {isSubmitting ? "Signing in..." : "Sign In"}
+              {isSubmitting ? "Logging in..." : "Login"}
             </Button>
           </form>
 
@@ -153,35 +139,7 @@ const Login = () => {
             </p>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-border/50">
-            <Link
-              to="/"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-2"
-            >
-              ← Back to home
-            </Link>
-          </div>
-          {process.env.NODE_ENV === 'development' && (
-            <div className="mt-4">
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full"
-                onClick={() => {
-                  const registeredUsers = localStorage.getItem('registeredUsers');
-                  const authToken = localStorage.getItem('authToken');
-                  const userEmail = localStorage.getItem('userEmail');
-                  
-                  console.log('Debug - Auth State:');
-                  console.log('Registered Users:', registeredUsers ? JSON.parse(registeredUsers) : 'None');
-                  console.log('Auth Token:', authToken);
-                  console.log('Current User Email:', userEmail);
-                }}
-              >
-                Debug: Check Auth State
-              </Button>
-            </div>
-          )}
+          {/* Removed back-to-home link and development debug UI per request */}
         </div>
       </div>
     </div>
