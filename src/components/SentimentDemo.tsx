@@ -93,6 +93,19 @@ export const SentimentDemo = () => {
     reader.readAsText(file);
   };
 
+  const loadExampleCsv = async () => {
+    try {
+      // data/example_comments.csv is in the repo and will be served at /data/example_comments.csv
+      const res = await fetch('/data/example_comments.csv');
+      if (!res.ok) throw new Error('Failed to fetch example CSV');
+      const text = await res.text();
+      const file = new File([text], 'example_comments.csv', { type: 'text/csv' });
+      handleFile(file);
+    } catch (err) {
+      toast.error('Could not load example CSV');
+    }
+  };
+
   const processComments = async (comments: string[]) => {
     setProcessing(true);
     setProgress({ done: 0, total: comments.length });
@@ -172,6 +185,25 @@ export const SentimentDemo = () => {
           onChange={(e) => setComment(e.target.value)}
           className="min-h-32 resize-none bg-card/50 backdrop-blur-sm border-primary/20 focus:border-primary/50 transition-colors"
         />
+
+        <div className="flex items-center gap-3">
+          <input
+            id="csvUpload"
+            type="file"
+            accept=".csv"
+            onChange={(e) => handleFile(e.target.files ? e.target.files[0] : null)}
+            className="text-sm"
+          />
+
+          <Button onClick={loadExampleCsv} className="px-3 py-1">
+            Load example CSV
+          </Button>
+
+          {processing && (
+            <div className="text-sm text-muted-foreground">Processing {progress.done}/{progress.total}</div>
+          )}
+        </div>
+
         <Button
           onClick={analyzeSentiment}
           disabled={loading}
