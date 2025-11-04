@@ -44,9 +44,9 @@ const Index = () => {
             <a href="#about" className="text-foreground/80 hover:text-foreground transition-colors hidden md:inline">
               About
             </a>
-            <a href="#demo" className="text-foreground/80 hover:text-foreground transition-colors hidden md:inline">
+            <Link to="/demo" className="text-foreground/80 hover:text-foreground transition-colors hidden md:inline">
               Demo
-            </a>
+            </Link>
             <a href="#team" className="text-foreground/80 hover:text-foreground transition-colors hidden md:inline">
               Team
             </a>
@@ -89,11 +89,11 @@ const Index = () => {
             Understanding Emotions Behind Every Comment
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <a href="#demo" className="inline-block">
+            <Link to="/demo" className="inline-block">
               <button className="px-8 py-4 bg-gradient-primary hover-glow rounded-full font-semibold text-lg">
                 Try Demo
               </button>
-            </a>
+            </Link>
             <a href="#about" className="inline-block">
               <button className="px-8 py-4 bg-card/50 backdrop-blur-sm hover-glow rounded-full font-semibold text-lg border border-primary/30">
                 Learn More
@@ -142,19 +142,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Demo Section */}
-      <section id="demo" className="py-20 px-4">
-        <div className="container mx-auto max-w-3xl">
-          <div className="text-center mb-12 animate-fade-in">
-            <Brain className="w-12 h-12 text-secondary mx-auto mb-4" />
-            <h2 className="text-4xl font-bold mb-4">Try It Yourself</h2>
-            <p className="text-muted-foreground text-lg">
-              Enter any YouTube comment and see our AI analyze its sentiment in real-time
-            </p>
-          </div>
-          <SentimentDemo />
-        </div>
-      </section>
+
 
       {/* Visualization Section */}
       <section id="visualization" className="py-20 px-4 bg-card/30 backdrop-blur-sm">
