@@ -15,6 +15,10 @@ export const SentimentDemo = () => {
   } | null>(null);
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] = useState<Array<{name: string; confidence: number}>>([]);
+  const [datasetChartData, setDatasetChartData] = useState<Array<{name: string; count: number}>>([]);
+  const [avgChartData, setAvgChartData] = useState<Array<{name: string; confidence: number}>>([]);
+  const [processing, setProcessing] = useState(false);
+  const [progress, setProgress] = useState({ done: 0, total: 0 });
 
   // detector moved to `src/lib/detectSentiment.ts` and is imported above
 
@@ -42,6 +46,95 @@ export const SentimentDemo = () => {
       else toast.error("Couldn't detect sentiment. Try a longer comment or add some context/emojis.");
       setLoading(false);
     }, 600);
+  };
+
+  // --- CSV upload & processing ---
+  const parseCSVText = (text: string) => {
+    const lines = text.split(/\r?\n/).filter((l) => l.trim() !== "");
+    if (lines.length === 0) return [] as string[];
+
+    const header = lines[0].split(/,\s*/).map(h => h.replace(/^"|"$/g, '').toLowerCase());
+    let commentIdx = -1;
+    for (let i = 0; i < header.length; i++) {
+      const h = header[i];
+      if (h.includes('comment') || h.includes('text') || h.includes('content')) {
+        commentIdx = i;
+        break;
+      }
+    }
+    const start = commentIdx === -1 ? 0 : 1; // if no header-match, assume first column and no header
+    const rowsStart = commentIdx === -1 ? 0 : 1;
+
+    const comments: string[] = [];
+    for (let i = rowsStart; i < lines.length; i++) {
+      const cols = lines[i].split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/).map(c => c.replace(/^"|"$/g, '').trim());
+      if (cols.length === 0) continue;
+      const textVal = commentIdx >= 0 ? cols[commentIdx] : cols[0];
+      if (textVal && textVal.trim() !== '') comments.push(textVal);
+    }
+    return comments;
+  };
+
+  const handleFile = (file: File | null) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = String(reader.result || '');
+      const comments = parseCSVText(text);
+      if (comments.length === 0) {
+        toast.error('No comments found in the uploaded CSV.');
+        return;
+      }
+      processComments(comments);
+    };
+    reader.onerror = () => {
+      toast.error('Failed to read file');
+    };
+    reader.readAsText(file);
+  };
+
+  const processComments = async (comments: string[]) => {
+    setProcessing(true);
+    setProgress({ done: 0, total: comments.length });
+
+    const counts = { positive: 0, neutral: 0, negative: 0 } as Record<string, number>;
+    const confSums = { positive: 0, neutral: 0, negative: 0 } as Record<string, number>;
+
+    const chunkSize = 200; // process in chunks to keep UI responsive
+    for (let i = 0; i < comments.length; i += chunkSize) {
+      const chunk = comments.slice(i, i + chunkSize);
+      for (const c of chunk) {
+        try {
+          const detected = detectSentiment(c);
+          if (detected) {
+            counts[detected.sentiment] += 1;
+            confSums[detected.sentiment] += detected.confidence;
+          }
+        } catch (e) {
+          // ignore single-row errors
+        }
+      }
+      setProgress(p => ({ ...p, done: Math.min(comments.length, i + chunk.length) }));
+      // yield to UI
+      await new Promise((res) => setTimeout(res, 10));
+    }
+
+    const datasetData = [
+      { name: 'Positive', count: counts.positive },
+      { name: 'Neutral', count: counts.neutral },
+      { name: 'Negative', count: counts.negative },
+    ];
+    setDatasetChartData(datasetData);
+
+    const avgData = [
+      { name: 'Positive', confidence: counts.positive ? confSums.positive / counts.positive : 0 },
+      { name: 'Neutral', confidence: counts.neutral ? confSums.neutral / counts.neutral : 0 },
+      { name: 'Negative', confidence: counts.negative ? confSums.negative / counts.negative : 0 }
+    ];
+    setAvgChartData(avgData);
+
+    setProcessing(false);
+    toast.success(`Processed ${comments.length} comments`);
   };
 
   const getSentimentIcon = () => {
