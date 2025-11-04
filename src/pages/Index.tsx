@@ -28,10 +28,11 @@ const Index = () => {
   ];
 
   const teamMembers = [
-    { name: "Team Member 1", role: "ML Engineer" },
-    { name: "Team Member 2", role: "Data Scientist" },
-    { name: "Team Member 3", role: "Frontend Developer" },
-    { name: "Team Member 4", role: "Backend Developer" },
+    { name: "P.KARTHIKEYAN", role: "ML Engineer" },
+    { name: "K.GOWTHAM", role: "Data Scientist" },
+    { name: "J.ANISH", role: "Frontend Developer" },
+    { name: "V.MUKESH", role: "Backend Developer" },
+    { name: "G.KISHOR", role: "Product Owner" },
   ];
 
   return (
