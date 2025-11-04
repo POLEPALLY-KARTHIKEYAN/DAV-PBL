@@ -254,6 +254,35 @@ export const SentimentDemo = () => {
           )}
         </>
       )}
+
+      {/* Dataset charts (appear after CSV processing) */}
+      {datasetChartData.length > 0 && (
+        <Card className="p-6">
+          <h4 className="mb-4 font-semibold">Sentiment distribution (counts)</h4>
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={datasetChartData}>
+              <XAxis dataKey="name" />
+              <YAxis allowDecimals={false} />
+              <Tooltip />
+              <Bar dataKey="count" fill="#10b981" />
+            </BarChart>
+          </ResponsiveContainer>
+        </Card>
+      )}
+
+      {avgChartData.length > 0 && (
+        <Card className="p-6">
+          <h4 className="mb-4 font-semibold">Average confidence per sentiment</h4>
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={avgChartData}>
+              <XAxis dataKey="name" />
+              <YAxis domain={[0, 1]} tickFormatter={(v) => `${Math.round(v * 100)}%`} />
+              <Tooltip formatter={(value) => `${(Number(value) * 100).toFixed(1)}%`} />
+              <Bar dataKey="confidence" fill="#2563eb" />
+            </BarChart>
+          </ResponsiveContainer>
+        </Card>
+      )}
     </div>
   );
 };
